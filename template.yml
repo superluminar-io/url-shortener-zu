@@ -27,6 +27,56 @@ Resources:
             Path: /greeting
             Method: post
 
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub ${PREFIX}-url-${PROJECT}
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+
+  URLCreate:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/handler/create
+      Runtime: go1.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DynamoDBTable
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+
+  URLResolve:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/handler/resolve
+      Runtime: go1.x
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref DynamoDBTable
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /{id}
+            Method: GET
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+
 Parameters:
   PREFIX:
     Type: String
