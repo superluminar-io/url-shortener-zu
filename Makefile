@@ -12,7 +12,7 @@ test:
 
 build-%: export GO111MODULE=on
 build-%:
-	@ go build -o ./dist/handler/$* ./src/$*
+	@ GOOS=linux GOARCH=amd64 go build -o ./dist/handler/$* ./src/$*
 
 build: clean
 build:
