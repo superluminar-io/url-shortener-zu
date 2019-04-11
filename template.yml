@@ -23,6 +23,17 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+  GreetingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: dist/handler/greeting
+      Events:
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /greeting
+            Method: post
 
 Parameters:
   PREFIX:
@@ -38,3 +49,6 @@ Outputs:
   HelloEndpoint:
     Description: "API Gateway endpoint URL for for Example Function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
+  GreetingEndpoint:
+    Description: "API Gateway endpoint URL for for Greeting Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/greeting"
