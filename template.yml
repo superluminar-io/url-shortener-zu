@@ -12,6 +12,17 @@ Resources:
         Variables:
           PREFIX: !Ref PREFIX
           PROJECT: !Ref PROJECT
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: dist/handler/hello-world
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
 
 Parameters:
   PREFIX:
@@ -24,3 +35,6 @@ Outputs:
     Value: !Ref PREFIX
   PROJECT:
     Value: !Ref PROJECT
+  HelloEndpoint:
+    Description: "API Gateway endpoint URL for for Example Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
