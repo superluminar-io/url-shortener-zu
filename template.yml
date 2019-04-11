@@ -2,6 +2,14 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
+  API:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub ${PROJECT}
+      EndpointConfiguration: REGIONAL
+      TracingEnabled: true
+      StageName: v1
+
   Function:
     Type: AWS::Serverless::Function
     Properties:
@@ -23,6 +31,7 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+            RestApiId: !Ref API
   GreetingFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -34,6 +43,7 @@ Resources:
           Properties:
             Path: /greeting
             Method: post
+            RestApiId: !Ref API
 
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
@@ -83,6 +93,7 @@ Resources:
           Properties:
             Path: /
             Method: POST
+            RestApiId: !Ref API
       Environment:
         Variables:
           DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
@@ -105,9 +116,11 @@ Resources:
           Properties:
             Path: /{id}
             Method: GET
+            RestApiId: !Ref API
       Environment:
         Variables:
           DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+      Tracing: Active
 
   PreviewGenerate:
     Type: AWS::Serverless::Function
@@ -132,6 +145,7 @@ Resources:
       Environment:
         Variables:
           DYNAMODB_TABLE_NAME: !Ref PreviewTable
+      Tracing: Active
 
 Parameters:
   PREFIX:
@@ -146,10 +160,10 @@ Outputs:
     Value: !Ref PROJECT
   HelloEndpoint:
     Description: "API Gateway endpoint URL for for Example Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello"
+    Value: !Sub "https://${API}.execute-api.${AWS::Region}.amazonaws.com/v1/hello"
   GreetingEndpoint:
     Description: "API Gateway endpoint URL for for Greeting Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/greeting"
+    Value: !Sub "https://${API}.execute-api.${AWS::Region}.amazonaws.com/v1/greeting"
   URLShortenerEndpoint:
     Description: "API Gateway endpoint URL for for Greeting Function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${API}.execute-api.${AWS::Region}.amazonaws.com/v1/"

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/badoux/goscraper"
 	"github.com/sirupsen/logrus"
@@ -18,7 +19,7 @@ type handler struct {
 	DynamoDBClient    dynamodbiface.DynamoDBAPI
 }
 
-func (h *handler) run(event events.DynamoDBEvent) (Response, error) {
+func (h *handler) run(ctx context.Context, event events.DynamoDBEvent) (Response, error) {
 
 	for _, r := range event.Records {
 		logrus.Infof("%v", r.Change.NewImage)
@@ -32,7 +33,7 @@ func (h *handler) run(event events.DynamoDBEvent) (Response, error) {
 			logrus.WithField("error", err).Errorf("failed to scrape '%s'", url)
 		}
 
-		_, err = h.DynamoDBClient.PutItem(&dynamodb.PutItemInput{
+		_, err = h.DynamoDBClient.PutItemWithContext(ctx, &dynamodb.PutItemInput{
 			TableName: aws.String(h.DynamoDBTableName),
 			Item: map[string]*dynamodb.AttributeValue{
 				"url":   {S: aws.String(url.String())},

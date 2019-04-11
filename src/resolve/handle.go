@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -12,10 +13,10 @@ type handler struct {
 	DynamoDBClient    dynamodbiface.DynamoDBAPI
 }
 
-func (h *handler) run(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func (h *handler) run(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	s := request.PathParameters["id"]
 
-	result, err := h.DynamoDBClient.GetItem(&dynamodb.GetItemInput{
+	result, err := h.DynamoDBClient.GetItemWithContext(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(h.DynamoDBTableName),
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {S: aws.String(s)},
