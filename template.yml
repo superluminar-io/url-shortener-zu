@@ -3,30 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 
 Resources:
 
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Runtime: go1.x
-      Handler: dist/handler/hello-world
-      Events:
-        GetEvent:
-          Type: Api
-          Properties:
-            Path: /hello
-            Method: get
-
-  GreetingFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Runtime: go1.x
-      Handler: dist/handler/greeting
-      Events:
-        PostEvent:
-          Type: Api
-          Properties:
-            Path: /greeting
-            Method: post
-
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
