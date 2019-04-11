@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Timeout: 180
+      Handler: dist/handler/example
+      Environment:
+        Variables:
+          PREFIX: !Ref PREFIX
+          PROJECT: !Ref PROJECT
+
+Parameters:
+  PREFIX:
+    Type: String
+  PROJECT:
+    Type: String
+
+Outputs:
+  PREFIX:
+    Value: !Ref PREFIX
+  PROJECT:
+    Value: !Ref PROJECT
