@@ -2,6 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 
 Resources:
+
   Function:
     Type: AWS::Serverless::Function
     Properties:
@@ -12,6 +13,18 @@ Resources:
         Variables:
           PREFIX: !Ref PREFIX
           PROJECT: !Ref PROJECT
+
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: dist/handler/hello-world
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
 
 Parameters:
   PREFIX:
@@ -24,3 +37,6 @@ Outputs:
     Value: !Ref PREFIX
   PROJECT:
     Value: !Ref PROJECT
+  Endpoint:
+    Description: "API Gateway endpoint URL for for Example Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
