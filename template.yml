@@ -15,6 +15,18 @@ Resources:
             Path: /hello
             Method: get
 
+  GreetingFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: go1.x
+      Handler: dist/handler/greeting
+      Events:
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /greeting
+            Method: post
+
 Parameters:
   PREFIX:
     Type: String
