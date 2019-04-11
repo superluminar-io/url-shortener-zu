@@ -35,6 +35,64 @@ Resources:
             Path: /greeting
             Method: post
 
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Join [ -, [ !Ref PREFIX, url, !Ref PROJECT ] ]
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+
+  URLCreate:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/handler/create
+      Runtime: go1.x
+      Policies:
+        - Version: '2012-10-17' # Allow write access to DynamoDB table
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource: !GetAtt DynamoDBTable.Arn
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: POST
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+
+  URLResolve:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/handler/resolve
+      Runtime: go1.x
+      Policies:
+        - Version: '2012-10-17' # Allow read access to DynamoDB table
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+              Resource: !GetAtt DynamoDBTable.Arn
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /{id}
+            Method: GET
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+
 Parameters:
   PREFIX:
     Type: String
@@ -52,3 +110,6 @@ Outputs:
   GreetingEndpoint:
     Description: "API Gateway endpoint URL for for Greeting Function"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/greeting"
+  URLShortenerEndpoint:
+    Description: "API Gateway endpoint URL for for Greeting Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
