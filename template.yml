@@ -48,6 +48,22 @@ Resources:
       AttributeDefinitions:
         - AttributeName: id
           AttributeType: S
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+
+  PreviewTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Join [ -, [ !Ref PREFIX, preview, !Ref PROJECT ] ]
+      KeySchema:
+        - AttributeName: url
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      AttributeDefinitions:
+        - AttributeName: url
+          AttributeType: S
 
   URLCreate:
     Type: AWS::Serverless::Function
@@ -92,6 +108,30 @@ Resources:
       Environment:
         Variables:
           DYNAMODB_TABLE_NAME: !Ref DynamoDBTable
+
+  PreviewGenerate:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/handler/preview
+      Runtime: go1.x
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:PutItem
+              Resource: !GetAtt PreviewTable.Arn
+      Events:
+        DynamoDBEvent:
+          Type: DynamoDB
+          Properties:
+            Stream:
+              !GetAtt DynamoDBTable.StreamArn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 10
+      Environment:
+        Variables:
+          DYNAMODB_TABLE_NAME: !Ref PreviewTable
 
 Parameters:
   PREFIX:
