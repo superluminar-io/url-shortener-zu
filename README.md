@@ -2,7 +2,7 @@
 
 [![MIT License](https://badgen.now.sh/badge/License/MIT/blue)](https://github.com/superluminar-io/boilerplate-go/blob/master/LICENSE.md)
 
-> Example AWS Lambda Function w/ Go
+> Example AWS Lambda Function with Go
 
 # Usage
 
